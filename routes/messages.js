@@ -32,11 +32,17 @@ router.get('/:chatType', authenticate, async (req, res) => {
       }
     } else {
       // Lógica de permisos para chats de grupo
+      //
+      // ¡¡¡ AQUÍ ESTÁ LA CORRECCIÓN !!!
+      // Agregamos a 'DOE' a la lista de permisos.
+      //
       const allowedChats = {
         alumno: ['general', 'alumnos'],
         profesor: ['general', 'alumnos', 'profesores'],
         preceptor: ['general', 'alumnos', 'profesores', 'preceptores'],
+        DOE: ['general', 'alumnos', 'profesores', 'preceptores'] // <-- AÑADIDO
       };
+
       if (!allowedChats[userType] || !allowedChats[userType].includes(chatType)) {
         return res.status(403).json({ error: 'Acceso denegado a este chat' });
       }
