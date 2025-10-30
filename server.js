@@ -21,12 +21,12 @@ requiredEnvVars.forEach(varName => {
 
 const app = express();
 app.use(express.json());
-app.use('/api/alumnos', alumnosRoutes);
+
 
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
 }));
 
 const connectDB = async () => {
@@ -52,14 +52,16 @@ mongoose.connection.on('error', (err) => {
 
 
 app.use('/api/auth', (req, res, next) => {
-  console.log(`[AUTH ROUTE] ${req.method} ${req.originalUrl}`);
-  next();
+  console.log(`[AUTH ROUTE] ${req.method} ${req.originalUrl}`);
+  next();
 });
 app.use('/api/auth', authRoutes); 
 
 app.use('/api/messages', messageRoutes);
   
 app.use('/api/users', userRoutes);
+
+app.use('/api/alumnos', alumnosRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Ruta no encontrada' });
