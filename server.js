@@ -6,6 +6,7 @@ import messageRoutes from './routes/messages.js';
 import dotenv from 'dotenv';
 import userRoutes from './routes/users.js';
 import alumnosRoutes from './routes/alumnos.js';
+import informeRoutes from './routes/informes.js';
 
 
 dotenv.config();
@@ -62,6 +63,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 
 app.use('/api/alumnos', alumnosRoutes);
+
+app.use('/api/informes', informeRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Ruta no encontrada' });
