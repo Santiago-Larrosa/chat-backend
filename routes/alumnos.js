@@ -32,7 +32,7 @@ router.post('/:id/observaciones', async (req, res) => {
         const nuevaObs = {
             titulo: req.body.titulo,
             texto: req.body.texto,
-            fecha: new Date().toISOString().split('T')[0]
+            fecha: new Date().toISOString()
         };
 
         alumno.observaciones.push(nuevaObs);
@@ -45,4 +45,5 @@ router.post('/:id/observaciones', async (req, res) => {
 });
 
 export default router;
+
 
