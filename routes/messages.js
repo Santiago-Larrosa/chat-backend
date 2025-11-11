@@ -31,21 +31,13 @@ router.get('/:chatType', authenticate, async (req, res) => {
         return res.status(403).json({ error: 'No tienes permiso para ver este chat' });
       }
     } else {
-      // Lógica de permisos para chats de grupo
-      //
-      // ¡¡¡ AQUÍ ESTÁ LA CORRECCIÓN !!!
-      // Agregamos a 'DOE' a la lista de permisos.
-      //
-      const allowedChats = {
-        alumno: ['general', 'alumnos'],
-        profesor: ['general', 'alumnos', 'profesores'],
-        preceptor: ['general', 'alumnos', 'profesores', 'preceptores'],
-        DOE: ['general', 'alumnos', 'profesores', 'preceptores'] // <-- AÑADIDO
-      };
-
-      if (!allowedChats[userType] || !allowedChats[userType].includes(chatType)) {
-        return res.status(403).json({ error: 'Acceso denegado a este chat' });
+      // 2. Lógica para chats de grupo (simplificada)
+      // Si no es un chat privado, solo puede ser 'general'.
+      if (chatType !== 'general') {
+        return res.status(403).json({ error: 'Acceso denegado. El chat de grupo no existe.' });
       }
+      // Todos los usuarios (DOE, regente) pueden acceder al 'general'.
+      // No se necesita más validación aquí.
     }
 
     let query = {};
