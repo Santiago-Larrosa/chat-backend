@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema({
   // --- CAMBIO: Campo añadido para el tipo de usuario ---
   userType: {
     type: String,
-    enum: ['Regente', 'DOE'],
-    default: 'alumno',
+    enum: ['regente', 'DOE'],
+    default: 'regente',
     required: true
   },
 }, { timestamps: true });
