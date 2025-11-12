@@ -6,26 +6,37 @@ import dotenv from 'dotenv';
 dotenv.config();
 const router = express.Router();
 
-// Middleware de autenticación (copiado de tus otras rutas)
+// Middleware de autenticación (asumiendo que lo tienes o lo añades)
 const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Acceso no autorizado' });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(403).json({ error: 'Token inválido' });
-    req.user = decoded;
-    next();
-  });
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'Acceso no autorizado, no hay token' });
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ error: 'Token inválido' });
+      }
+      req.user = decoded;
+      next();
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en autenticación' });
+  }
 };
 
-// POST: Crear un nuevo informe
+// POST: Crear un nuevo informe de convivencia
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { nombre, contenido } = req.body;
-    if (!nombre || !contenido) {
-      return res.status(400).json({ error: 'Nombre y contenido son obligatorios' });
-    }
-    const nuevoInforme = new Informe({ nombre, contenido });
+    // El 'req.body' ahora contendrá todos los campos del formulario
+    // Asignamos el autor basado en el token
+    const informeData = {
+      ...req.body,
+      // Opcional: registrar quién guardó el informe
+      // autorId: req.user.id,
+      // autorNombre: req.user.username,
+    };
+    const nuevoInforme = new Informe(informeData);
     await nuevoInforme.save();
     res.status(201).json(nuevoInforme);
   } catch (err) {
@@ -34,19 +45,20 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// GET: Buscar informes por nombre
+// GET: Buscar informes POR NOMBRE DE ALUMNO
 router.get('/', authenticate, async (req, res) => {
   try {
     const { search } = req.query;
     let query = {};
 
     if (search) {
-      // Usamos regex para buscar nombres que "contengan" el término de búsqueda
-      query.nombre = { $regex: search, $options: 'i' };
+      // --- ¡CAMBIO CLAVE! ---
+      // Buscamos usando 'alumnoNombre' en lugar de 'nombre'
+      query.alumnoNombre = { $regex: search, $options: 'i' };
     }
 
-    // Devolvemos los 10 más recientes que coincidan
-    const informes = await Informe.find(query).sort({ createdAt: -1 }).limit(10);
+    // Devolvemos los más recientes que coincidan
+    const informes = await Informe.find(query).sort({ createdAt: -1 });
     res.json(informes);
   } catch (err) {
     console.error("Error al buscar informes:", err);
